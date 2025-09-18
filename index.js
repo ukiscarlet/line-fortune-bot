@@ -15,7 +15,6 @@ const config = {
 const client = new line.Client(config);
 const app = express();
 
-// 解析 JSON
 app.use(express.json());
 
 // 靜態圖片目錄
@@ -45,30 +44,15 @@ async function handleEvent(event) {
     const fortunes = ["大吉", "中吉", "小吉", "吉", "末吉", "凶", "大凶"];
     const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
 
-    const imageUrl = `https://${process.env.RAILWAY_STATIC_URL}/images/${pick}.png`;
+    // 圖片 URL，這裡使用 Railway 的 Public URL
+    const imageUrl = `https://你的專案名.up.railway.app/images/${pick}.png`;
 
-    // 優先用 replyMessage 回覆（有權限的群組）
-    if (event.replyToken && !event.replyToken.startsWith("000000")) {
-      try {
-        await client.replyMessage(event.replyToken, {
-          type: "image",
-          originalContentUrl: imageUrl,
-          previewImageUrl: imageUrl
-        });
-        return;
-      } catch (err) {
-        console.warn("replyMessage 失敗，改用 pushMessage", err);
-      }
-    }
-
-    // 如果 reply 失敗或沒權限，使用 pushMessage
-    if (groupId) {
-      await client.pushMessage(groupId, {
-        type: "image",
-        originalContentUrl: imageUrl,
-        previewImageUrl: imageUrl
-      });
-    }
+    // 直接用 pushMessage 發送給群組
+    await client.pushMessage(groupId, {
+      type: "image",
+      originalContentUrl: imageUrl,
+      previewImageUrl: imageUrl
+    });
   }
 }
 
