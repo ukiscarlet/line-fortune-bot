@@ -39,7 +39,7 @@ async function handleEvent(event) {
   const groupId = event.source.groupId || event.source.roomId;
   if (!groupId) return; // 個人聊天不處理
 
-  if (text.includes("抽籤")) {
+  if (text.includes("hands together")) {
     const fortunes = ["大吉", "中吉", "小吉", "吉", "末吉", "凶", "大凶"];
     const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
 
