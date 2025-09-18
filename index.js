@@ -45,7 +45,7 @@ async function handleEvent(event) {
     const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
 
     // 圖片 URL，這裡使用 Railway 的 Public URL
-    const imageUrl = `https://你的專案名.up.railway.app/images/${pick}.png`;
+    const imageUrl = `https://line-fortune-bot-production.up.railway.app/images/${pick}.png`;
 
     // 直接用 pushMessage 發送給群組
     await client.pushMessage(groupId, {
