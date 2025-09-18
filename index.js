@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// LINE Channel 設定
+// LINE 設定
 const config = {
   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
   channelSecret: process.env.LINE_CHANNEL_SECRET
@@ -25,7 +25,7 @@ app.post("/webhook", async (req, res) => {
   try {
     const events = req.body.events;
     await Promise.all(events.map(handleEvent));
-    res.status(200).send("OK"); // LINE 必須收到 200
+    res.status(200).send("OK");
   } catch (err) {
     console.error(err);
     res.status(500).send("Error");
@@ -37,22 +37,24 @@ async function handleEvent(event) {
 
   const text = event.message.text;
   const groupId = event.source.groupId || event.source.roomId;
-
   if (!groupId) return; // 個人聊天不處理
 
   if (text.includes("抽籤")) {
     const fortunes = ["大吉", "中吉", "小吉", "吉", "末吉", "凶", "大凶"];
     const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
 
-    // 圖片 URL，這裡使用 Railway 的 Public URL
-    const imageUrl = `https://line-fortune-bot-production.up.railway.app/images/${pick}.png`;
+    // 中文 URL encode
+    const imageUrl = `https://${process.env.RAILWAY_STATIC_URL}/images/${encodeURIComponent(pick)}.png`;
 
-    // 直接用 pushMessage 發送給群組
-    await client.pushMessage(groupId, {
-      type: "image",
-      originalContentUrl: imageUrl,
-      previewImageUrl: imageUrl
-    });
+    try {
+      await client.pushMessage(groupId, {
+        type: "image",
+        originalContentUrl: imageUrl,
+        previewImageUrl: imageUrl
+      });
+    } catch (err) {
+      console.error("pushMessage 失敗：", err);
+    }
   }
 }
 
@@ -61,6 +63,6 @@ app.get("/", (req, res) => {
   res.send("LINE 群組抽籤 Bot 正常運作！");
 });
 
-// 監聽 Railway 自動分配的 port
+// 監聽 Railway 自動分配 port
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
