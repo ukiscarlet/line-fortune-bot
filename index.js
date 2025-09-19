@@ -44,7 +44,7 @@ async function handleEvent(event) {
     const fortunes = ["大吉", "中吉", "小吉", "吉", "末吉", "凶", "大凶"];
     const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
 
-    const imageUrl = `https://${process.env.RAILWAY_STATIC_URL}/images/${encodeURIComponent(pick)}.png`;
+    const imageUrl = `https://${process.env.RAILWAY_STATIC_URL}/images/${encodeURIComponent(pick)}.jpg`;
 
     try {
       await client.pushMessage(groupId, {
