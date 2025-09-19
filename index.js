@@ -40,7 +40,8 @@ async function handleEvent(event) {
   if (!groupId) return; // 個人聊天不處理
 
   // ======= 抽籤功能 =======
-  if (text.includes("hands together")) {
+  const pullText = ["(hands together)","(拜託)","pray"]
+  if (pullText.some(word => text.includes(pullText))) {
     const fortunes = ["大吉", "中吉", "小吉", "吉", "末吉", "凶", "大凶"];
     const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
 
