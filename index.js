@@ -40,23 +40,24 @@ async function handleEvent(event) {
   if (!groupId) return; // 個人聊天不處理
 
   // ======= 抽籤功能 =======
-  const pullText = ["(hands together)","(拜託)","pray"]
-  if (pullText.some(word => text.includes(pullText))) {
-    const fortunes = ["大吉", "中吉", "小吉", "吉", "末吉", "凶", "大凶"];
-    const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
+const pullText = ["(hands together)", "(拜託)", "pray"];
+if (pullText.some(word => text.includes(word))) {
+  const fortunes = ["大吉", "中吉", "小吉", "吉", "末吉", "凶", "大凶"];
+  const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
 
-    const imageUrl = `https://${process.env.RAILWAY_STATIC_URL}/images/${encodeURIComponent(pick)}.jpg`;
+  const imageUrl = `https://${process.env.RAILWAY_STATIC_URL}/images/${encodeURIComponent(pick)}.jpg`;
 
-    try {
-      await client.pushMessage(groupId, {
-        type: "image",
-        originalContentUrl: imageUrl,
-        previewImageUrl: imageUrl
-      });
-    } catch (err) {
-      console.error("抽籤 pushMessage 失敗：", err);
-    }
+  try {
+    await client.pushMessage(groupId, {
+      type: "image",
+      originalContentUrl: imageUrl,
+      previewImageUrl: imageUrl
+    });
+  } catch (err) {
+    console.error("抽籤 pushMessage 失敗：", err);
   }
+}
+
 
   // ======= 今日吃什麼功能 =======
   if (text.includes("meat")) {
