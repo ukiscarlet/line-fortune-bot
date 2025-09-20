@@ -141,7 +141,7 @@ async function handleEvent(event) {
   // ======= 今日旅遊功能 =======
   const travelTrigger = ["travel","旅遊","台灣景點"];
   if (travelTrigger.some(word => text.includes(word))) {
-    const cities = ["台北市","基隆市","桃園市","新竹市", "台中市","彰化市" ,"嘉義市", "台南市","高雄市", "屏東市","恆春","台東市" "花蓮市", "宜蘭市"];
+    const cities = ["台北市","基隆市","桃園市","新竹市","台中市","彰化市","嘉義市","台南市","高雄市","屏東市","恆春","台東市","花蓮市","宜蘭市"];
     const pickCity = cities[Math.floor(Math.random() * cities.length)];
     const wikiUrl = `https://zh.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pickCity)}`;
 
