@@ -104,7 +104,7 @@ async function handleEvent(event) {
   }
 
   // ======= 今日吃什麼（台灣）功能 =======
-  const foodTriggerTW = ["twfood","台灣料理","吃"];
+  const foodTriggerTW = ["twfood","台灣料理"];
   if (foodTriggerTW.some(word => text.includes(word))) {
     const foodsTW = [
       "牛肉麵 / 牛肉麺",
