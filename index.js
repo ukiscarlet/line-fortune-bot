@@ -19,6 +19,7 @@ app.use(express.json());
 
 // 靜態圖片目錄
 app.use("/images", express.static(path.join(__dirname, "images")));
+app.use("/sounds", express.static(path.join(__dirname, "sounds")));
 
 // Webhook
 app.post("/webhook", async (req, res) => {
@@ -216,7 +217,22 @@ async function handleEvent(event) {
       });
     }
   }
-}
+	  // ======= 播放音效功能（多關鍵詞觸發） =======
+	const soundTriggers = ["dinosaur", "恐龍","恐竜"]; // 可擴充更多觸發詞
+	if (soundTriggers.some(word => text.includes(word))) {
+	  const audioUrl = `https://${process.env.RAILWAY_STATIC_URL}/sounds/TRaxSound.mp3`;
+
+	  try {
+		await client.pushMessage(groupId, {
+		  type: "audio",
+		  originalContentUrl: audioUrl,
+		  duration: 2000 // 毫秒，請依實際長度修改
+		});
+	  } catch (err) {
+		console.error("播放音效失敗：", err);
+	  }
+	}
+}//End
 
 // 測試用 GET
 app.get("/", (req, res) => {
