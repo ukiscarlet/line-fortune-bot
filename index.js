@@ -41,7 +41,7 @@ async function handleEvent(event) {
   if (!groupId) return; // 個人聊天不處理
 
   // ======= 群組抽籤功能 =======
-  const pullText = ["(hands together)","(拜託)","pray"];
+  const pullText = ["(hands together)","(拜託)","pray","祈る"];
   if (pullText.some(word => text.includes(word))) {
     const fortunes = ["大吉", "中吉", "小吉", "吉", "末吉", "凶", "大凶"];
     const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
@@ -104,7 +104,7 @@ async function handleEvent(event) {
   }
 
   // ======= 今日吃什麼（台灣）功能 =======
-  const foodTriggerTW = ["台灣美食","taiwan","吃什麼","小吃"];
+  const foodTriggerTW = ["twfood","台灣料理","吃"];
   if (foodTriggerTW.some(word => text.includes(word))) {
     const foodsTW = [
       "牛肉麵 / 牛肉麺",
@@ -140,7 +140,7 @@ async function handleEvent(event) {
   }
 
   // ======= 今日旅遊功能 =======
-  const travelTrigger = ["travel","旅遊","台灣景點"];
+  const travelTrigger = ["travel","旅行","台灣景點"];
   if (travelTrigger.some(word => text.includes(word))) {
     const cities = ["台北市","基隆市","桃園市","新竹市","台中市","彰化市","嘉義市","台南市","高雄市","屏東市","恆春","台東市","花蓮市","宜蘭市"];
     const pickCity = cities[Math.floor(Math.random() * cities.length)];
