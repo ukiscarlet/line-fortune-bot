@@ -2,6 +2,7 @@ import express from "express";
 import line from "@line/bot-sdk";
 import path from "path";
 import { fileURLToPath } from "url";
+import fetch from "node-fetch";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,7 +21,7 @@ app.use(express.json());
 // 靜態圖片目錄
 app.use("/images", express.static(path.join(__dirname, "images")));
 
-// ======= Webhook =======
+// Webhook
 app.post("/webhook", async (req, res) => {
   try {
     const events = req.body.events;
@@ -39,8 +40,8 @@ async function handleEvent(event) {
   const groupId = event.source.groupId || event.source.roomId;
   if (!groupId) return; // 個人聊天不處理
 
-  // ======= 抽籤功能 =======
-  const pullText = ["(hands together)", "(拜託)", "pray"];
+  // ======= 群組抽籤功能 =======
+  const pullText = ["(hands together)","(拜託)","pray"];
   if (pullText.some(word => text.includes(word))) {
     const fortunes = ["大吉", "中吉", "小吉", "吉", "末吉", "凶", "大凶"];
     const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
@@ -90,21 +91,21 @@ async function handleEvent(event) {
       "天ぷら / 天婦羅",
       "餃子 / 餃子"
     ];
-    const pick = foods[Math.floor(Math.random() * foods.length)];
+    const pick = foodsJP[Math.floor(Math.random() * foodsJP.length)];
 
     try {
       await client.pushMessage(groupId, {
         type: "text",
-        text: `今日のおすすめは…「${pick}」です！`
+        text: `今日推薦…「${pick}」!`
       });
     } catch (err) {
-      console.error("吃什麼（日式） pushMessage 失敗：", err);
+      console.error("日式吃什麼 pushMessage 失敗：", err);
     }
   }
 
-  // ======= 今日吃什麼 v2（台灣版） =======
-  const triggerTW = ["twfood", "吃什麼", "台灣美食"];
-  if (triggerTW.some(word => text.includes(word))) {
+  // ======= 今日吃什麼（台灣）功能 =======
+  const foodTriggerTW = ["台灣美食","taiwan","吃什麼","小吃"];
+  if (foodTriggerTW.some(word => text.includes(word))) {
     const foodsTW = [
       "牛肉麵 / 牛肉麺",
       "滷肉飯 / 魯肉飯",
@@ -131,17 +132,96 @@ async function handleEvent(event) {
     try {
       await client.pushMessage(groupId, {
         type: "text",
-        text: `今天推薦…「${pick}」！`
+        text: `今天推薦..「${pick}」!`
       });
     } catch (err) {
-      console.error("吃什麼（台灣版） pushMessage 失敗：", err);
+      console.error("台灣吃什麼 pushMessage 失敗：", err);
+    }
+  }
+
+  // ======= 今日旅遊功能 =======
+  const travelTrigger = ["travel","旅遊","台灣景點"];
+  if (travelTrigger.some(word => text.includes(word))) {
+    const cities = ["台北", "台中", "高雄", "台南", "花蓮", "宜蘭", "嘉義", "新竹", "屏東"];
+    const pickCity = cities[Math.floor(Math.random() * cities.length)];
+    const wikiUrl = `https://zh.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pickCity)}`;
+
+    try {
+      const response = await fetch(wikiUrl);
+      const data = await response.json();
+
+      const title = data.title || pickCity;
+      const description = data.extract || "沒有找到簡介";
+      const imageUrl = data.originalimage?.source || "";
+
+      const flexMessage = {
+        type: "flex",
+        altText: `${title} 旅遊卡片`,
+        contents: {
+          type: "bubble",
+          hero: imageUrl ? {
+            type: "image",
+            url: imageUrl,
+            size: "full",
+            aspectRatio: "20:13",
+            aspectMode: "cover"
+          } : undefined,
+          body: {
+            type: "box",
+            layout: "vertical",
+            spacing: "md",
+            contents: [
+              {
+                type: "text",
+                text: title,
+                weight: "bold",
+                size: "lg"
+              },
+              {
+                type: "text",
+                text: description.length > 200 ? description.slice(0, 200) + "..." : description,
+                wrap: true,
+                size: "sm",
+                color: "#666666"
+              }
+            ]
+          },
+          footer: {
+            type: "box",
+            layout: "vertical",
+            spacing: "sm",
+            contents: [
+              {
+                type: "button",
+                style: "link",
+                height: "sm",
+                action: {
+                  type: "uri",
+                  label: "查看更多",
+                  uri: data.content_urls?.desktop?.page || `https://zh.wikipedia.org/wiki/${encodeURIComponent(pickCity)}`
+                }
+              }
+            ],
+            flex: 0
+          }
+        }
+      };
+
+      await client.pushMessage(groupId, flexMessage);
+
+    } catch (err) {
+      console.error("旅遊功能失敗：", err);
+      await client.pushMessage(groupId, {
+        type: "text",
+        text: "查詢旅遊資訊失敗，請稍後再試。"
+      });
     }
   }
 }
 
-// ======= 測試用 GET =======
+// 測試用 GET
 app.get("/", (req, res) => {
-  res.send("LINE 群組抽籤 Bot 正常運作！");
+  res.send("LINE 群組多功能 Bot 正常運作！");
 });
 
 // 監聽 Railway 自動分配 port
