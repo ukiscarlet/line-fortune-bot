@@ -62,7 +62,7 @@ async function handleEvent(event) {
   // ======= 今日吃什麼（日式版） =======
   const triggerJapanese = ["jpfood", "食べ", "日本料理"];
   if (triggerJapanese.some(word => text.includes(word))) {
-    const foods = [
+    const foodsJP = [
       "すき焼き / 壽喜燒",
       "うな重 / 鰻魚飯",
       "おにぎり / 飯糰",
